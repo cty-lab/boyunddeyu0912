@@ -32,26 +32,26 @@
         h1 { 
             color: var(--color-dark-blue-gray);
             margin-bottom: 40px;
-            font-size: 2.16em; /* 標題字體：放大 20% */
+            font-size: 2.16em; 
         }
         input[type="text"] { 
-            padding: 16px; /* 放大 15% */
+            padding: 16px; 
             margin-bottom: 25px; 
             width: 90%; 
-            max-width: 368px; /* 放大 15% */
+            max-width: 368px; 
             border: 2px solid var(--color-input-border);
             border-radius: 8px; 
-            font-size: 1.25em; /* 放大 15% */
+            font-size: 1.25em; 
             outline: none;
         }
         button { 
-            padding: 16px 35px; /* 放大 15% */
+            padding: 16px 35px; 
             background-color: var(--color-button-bg);
             color: var(--color-text-light);
             border: none; 
             border-radius: 8px;
             cursor: pointer; 
-            font-size: 1.25em; /* 放大 15% */
+            font-size: 1.25em; 
             transition: background-color 0.3s ease, transform 0.2s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
@@ -64,9 +64,9 @@
             cursor: wait;
         }
         
-        /* === 圖片樣式：預設/電腦版尺寸 (放大 15% 至 80%) === */
+        /* === 圖片樣式：預設/電腦版尺寸 (80%) === */
         .wedding-design-image {
-            max-width: 80%; /* 寬度放大 15% (原 65% + 15%) */
+            max-width: 80%; 
             height: auto; 
             margin-top: 40px; 
             margin-bottom: 20px;
@@ -74,20 +74,25 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         
+        /* === 關鍵修正：使用 margin: auto 確保水平置中 === */
         #result { 
             margin-top: 30px; 
+            margin-left: auto; 
+            margin-right: auto; 
             padding: 25px;
             border: 2px solid #DCE0E6;
             border-radius: 12px;
-            display: inline-block;
+            display: block; /* 關鍵：設為區塊元素 */
             width: 90%; 
             max-width: 400px;
-            font-size: 1.2em; /* 維持不變或可根據需求放大 */
+            font-size: 1.2em;
             line-height: 1.6;
             background-color: var(--color-background-main);
             box-shadow: 0 6px 15px rgba(0,0,0,0.1);
             text-align: center;
         }
+        /* ==================================== */
+        
         .found { 
             background-color: var(--color-result-found-bg);
             color: var(--color-result-found-text);
@@ -103,10 +108,10 @@
             font-weight: bold;
         }
 
-        /* === 媒體查詢：手機版優化 (圖片放大 15% 至 90% + 15% = 100% 上限) === */
+        /* === 媒體查詢：手機版圖片放大優化 === */
         @media (max-width: 768px) {
             .wedding-design-image {
-                max-width: 100%; /* 手機上放大到 100% 寬度 (原 90% + 15%) */
+                max-width: 100%; 
             }
         }
     </style>
@@ -135,12 +140,10 @@
                 const response = await fetch(GOOGLE_SHEET_URL);
                 const csvText = await response.text();
                 
-                // 解析 CSV 文本：跳過標題行
                 const rows = csvText.split('\n').slice(1);
                 
                 return rows.map(row => {
                     const columns = row.split(',');
-                    // 假設 A=姓名 (0), B=桌號 (1), C=稱謂 (2)
                     const name = columns[0] ? columns[0].trim() : ''; 
                     const table = columns[1] ? columns[1].trim() : '';
                     const alias = columns[2] ? columns[2].trim() : '';
@@ -166,7 +169,7 @@
             resultDiv.innerHTML = "載入賓客名單中，請稍候..."; 
             resultDiv.className = "";
 
-            g_seatingChart = await loadSeatingChart(); // 載入資料
+            g_seatingChart = await loadSeatingChart(); 
 
             if (g_seatingChart.length > 0) {
                 searchButton.disabled = false;
@@ -178,7 +181,7 @@
             }
         }
         
-        // 搜尋函數：使用已載入的資料進行同步查詢 (無彩蛋)
+        // 搜尋函數：使用已載入的資料進行同步查詢
         function searchSeat() {
             const guestNameInput = document.getElementById("guestName").value;
             const cleanedName = guestNameInput.trim(); 
