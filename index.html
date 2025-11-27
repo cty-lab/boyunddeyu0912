@@ -2,10 +2,10 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>婚禮座位查詢</title>
     <style>
-        /* CSS 樣式：主題顏色與字體設定不變 */
+        /* CSS 樣式：主題顏色與字體設定 */
         :root {
             --color-light-green: #CDE9B9;
             --color-dark-blue-gray: #6B7C95;
@@ -64,7 +64,7 @@
             cursor: wait;
         }
         
-        /* === 圖片樣式 === */
+        /* === 圖片樣式：預設/電腦版尺寸 (65%) === */
         .wedding-design-image {
             max-width: 65%; 
             height: auto; 
@@ -73,17 +73,6 @@
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
-        /* === 貓咪彩蛋圖片樣式 === */
-        .cat-easter-egg-image {
-            max-width: 80%;
-            height: auto;
-            margin-top: 30px;
-            margin-bottom: 20px;
-            border-radius: 15px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-            display: none; 
-        }
-        /* ==================================== */
         
         #result { 
             margin-top: 30px; 
@@ -113,6 +102,13 @@
             color: var(--color-dark-blue-gray);
             font-weight: bold;
         }
+
+        /* === 媒體查詢：手機版優化 (寬度小於 768px 時，圖片放大) === */
+        @media (max-width: 768px) {
+            .wedding-design-image {
+                max-width: 90%; /* 手機上圖片放大到 90% 寬度 */
+            }
+        }
     </style>
 </head>
 <body>
@@ -125,12 +121,10 @@
         在這裡輸入姓名，查詢您的座位。
     </div>
 
-    <img src="cat.jpg" alt="這是可愛的蘇半甲貓咪！" class="cat-easter-egg-image" id="catEasterEgg">
-
     <img src="婚禮座位表.jpg" alt="婚禮設計主題圖片" class="wedding-design-image">
 
     <script>
-        // 使用您提供的最終連結
+        // 【⭐ Google Sheets 連動：最終正確連結 ⭐】
         const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGD48WcMcPGkukcJyKEkA6vyl9TRBggoT0cAYqnXEDqqca1yftj9CFK1ChywRAng/pub?output=csv'; 
         
         let g_seatingChart = []; 
@@ -149,9 +143,10 @@
                     // 假設 A=姓名 (0), B=桌號 (1), C=稱謂 (2)
                     const name = columns[0] ? columns[0].trim() : ''; 
                     const table = columns[1] ? columns[1].trim() : '';
-                    const alias = columns[2] ? columns[2].trim() : ''; // 讀取稱謂
+                    const alias = columns[2] ? columns[2].trim() : '';
 
                     if (name && table) {
+                        // 返回包含稱謂的物件
                         return { name: name, table: table, alias: alias };
                     }
                 }).filter(item => item !== undefined);
@@ -169,14 +164,13 @@
             const searchButton = document.getElementById("searchButton");
             
             searchButton.disabled = true;
-            resultDiv.innerHTML = "載入賓客名單中..."; 
+            resultDiv.innerHTML = "載入賓客名單中，請稍候..."; 
             resultDiv.className = "";
 
-            g_seatingChart = await loadSeatingChart(); 
+            g_seatingChart = await loadSeatingChart(); // 載入資料
 
             if (g_seatingChart.length > 0) {
                 searchButton.disabled = false;
-                // 成功後，保持初始提示文字
                 resultDiv.innerHTML = "在這裡輸入姓名，查詢您的座位。"; 
             } else {
                 searchButton.disabled = true;
@@ -185,18 +179,14 @@
             }
         }
         
-        // 搜尋函數：使用已載入的資料進行同步查詢
+        // 搜尋函數：使用已載入的資料進行同步查詢 (無彩蛋)
         function searchSeat() {
             const guestNameInput = document.getElementById("guestName").value;
             const cleanedName = guestNameInput.trim(); 
 
             const resultDiv = document.getElementById("result");
-            const catEasterEggImage = document.getElementById("catEasterEgg");
 
-            // --- 重置所有顯示狀態 ---
             resultDiv.style.display = 'inline-block';
-            catEasterEggImage.style.display = 'none';
-            // --- 重置結束 ---
 
             if (cleanedName === "") {
                 resultDiv.innerHTML = "嗨嗨~請輸入本名或稱謂才能找到你喔！";
@@ -207,19 +197,11 @@
             // 將輸入轉為小寫，方便模糊搜尋
             const searchKey = cleanedName.toLowerCase();
 
-            // --- 貓咪彩蛋判斷 ---
-            if (searchKey === "蘇半甲".toLowerCase()) {
-                resultDiv.style.display = 'none';
-                catEasterEggImage.style.display = 'block';
-                return;
-            }
-            // --- 彩蛋判斷結束 ---
-
-            // 【最終優化】：搜尋邏輯 -> 檢查姓名 AND 檢查稱謂 (模糊包含)
+            // 搜尋邏輯：檢查姓名 AND 檢查稱謂 (模糊包含)
             const foundGuest = g_seatingChart.find(guest => 
-                // 1. 檢查姓名是否完全匹配 (不分大小寫)
+                // 1. 檢查姓名是否完全匹配
                 guest.name.toLowerCase() === searchKey ||
-                // 2. 檢查 alias 欄位是否包含搜尋的關鍵詞 (模糊搜尋)
+                // 2. 檢查稱謂欄位是否包含搜尋的關鍵詞 (模糊搜尋)
                 guest.alias.toLowerCase().includes(searchKey)
             );
 
