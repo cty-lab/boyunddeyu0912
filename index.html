@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>婚禮座位查詢</title>
     <style>
+        /* === 關鍵修正：確保寬度計算不會溢出，解決跑版問題 === */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        /* ================================================= */
+
         /* CSS 樣式：主題顏色與字體設定 */
         :root {
             --color-light-green: #CDE9B9;
@@ -21,27 +27,26 @@
             --color-result-found-text: var(--color-dark-green);
         }
 
-        /* === 【極致置中修正 1】: Body 採用 Flexbox 佈局 === */
+        /* === Body 採用 Flexbox 佈局：確保內容水平居中 === */
         body { 
             font-family: '微軟正黑體', 'Arial', sans-serif;
-            margin: 0; /* 移除瀏覽器預設邊距 */
+            margin: 0; 
             background-color: var(--color-background-main);
             color: var(--color-text-dark);
-            overflow-x: hidden; 
-            min-height: 100vh; /* 確保內容區塊覆蓋整個畫面 */
-
-            display: flex; /* 啟用 Flexbox */
-            justify-content: center; /* 水平居中所有內容 */
-            align-items: flex-start; /* 讓內容從頂部開始堆疊 */
-            text-align: initial; /* 重置繼承的文字對齊 */
+            /* 移除 overflow-x: hidden; 以防 Flexbox 被錯誤影響，讓 Flexbox 自行處理 */
+            min-height: 100vh; 
+            display: flex;
+            justify-content: center; /* 水平居中 */
+            align-items: flex-start;
+            text-align: initial; 
         }
 
-        /* === 【極致置中修正 2】: 內容包裝器 (確保內容置中堆疊) === */
+        /* 內容包裝器：Flexbox 會將這個 div 放在畫面中央 */
         #app-wrapper {
             width: 100%;
-            max-width: 500px; /* 限制內容最大寬度 */
-            padding: 20px 10px; /* 內邊距 */
-            text-align: center; /* 讓圖片、按鈕等內容在包裝器內居中 */
+            max-width: 500px;
+            padding: 20px 10px; 
+            text-align: center; 
         }
 
         h1 { 
@@ -50,7 +55,7 @@
             font-size: 2.16em; 
         }
         
-        /* === 輸入欄位：維持區塊模式並確保置中 === */
+        /* 輸入欄位：確保置中 */
         input[type="text"] { 
             padding: 16px; 
             margin: 0 auto 25px auto; 
@@ -93,7 +98,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         
-        /* === 結果框：使用 margin: auto 置中，文字靠左 === */
+        /* === 結果框：使用 margin: auto 置中，內部文字靠左 === */
         #result { 
             margin: 30px auto 0 auto; 
             padding: 25px;
