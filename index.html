@@ -117,7 +117,7 @@
 </head>
 <body>
     <h1>蘇柏瑜與張德妤的婚禮</h1>
-    <input type="text" id="guestName" placeholder="請輸入您的姓名">
+    <input type="text" id="guestName" placeholder="請輸入姓名或稱謂">
     
     <button onclick="searchSeat()" id="searchButton">查詢座位</button>
     
@@ -130,7 +130,7 @@
     <img src="婚禮座位表.jpg" alt="婚禮設計主題圖片" class="wedding-design-image">
 
     <script>
-        // 【⭐ 最終連動：使用您提供的 Google Sheets CSV 連結 ⭐】
+        // 使用您提供的最終連結
         const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGD48WcMcPGkukcJyKEkA6vyl9TRBggoT0cAYqnXEDqqca1yftj9CFK1ChywRAng/pub?output=csv'; 
         
         let g_seatingChart = []; 
@@ -141,16 +141,18 @@
                 const response = await fetch(GOOGLE_SHEET_URL);
                 const csvText = await response.text();
                 
-                // 解析 CSV 文本：跳過標題行，將每行分割成姓名和桌號
+                // 解析 CSV 文本：跳過標題行
                 const rows = csvText.split('\n').slice(1);
                 
                 return rows.map(row => {
                     const columns = row.split(',');
+                    // 假設 A=姓名 (0), B=桌號 (1), C=稱謂 (2)
                     const name = columns[0] ? columns[0].trim() : ''; 
                     const table = columns[1] ? columns[1].trim() : '';
+                    const alias = columns[2] ? columns[2].trim() : ''; // 讀取稱謂
 
                     if (name && table) {
-                        return { name: name, table: table };
+                        return { name: name, table: table, alias: alias };
                     }
                 }).filter(item => item !== undefined);
                 
@@ -166,20 +168,19 @@
             const resultDiv = document.getElementById("result");
             const searchButton = document.getElementById("searchButton");
             
-            // 初始狀態：禁用按鈕並顯示載入訊息
             searchButton.disabled = true;
-            resultDiv.innerHTML = "載入賓客名單中，請稍候...";
+            resultDiv.innerHTML = "載入賓客名單中..."; 
             resultDiv.className = "";
 
-            g_seatingChart = await loadSeatingChart(); // 載入資料
+            g_seatingChart = await loadSeatingChart(); 
 
-            // 最終狀態：啟用按鈕並顯示準備完畢
             if (g_seatingChart.length > 0) {
                 searchButton.disabled = false;
-                resultDiv.innerHTML = `名單載入完畢 (共 ${g_seatingChart.length} 筆)，請輸入姓名查詢座位。`;
+                // 成功後，保持初始提示文字
+                resultDiv.innerHTML = "在這裡輸入姓名，查詢您的座位。"; 
             } else {
                 searchButton.disabled = true;
-                resultDiv.innerHTML = "🚨 賓客資料為空或載入失敗，請檢查 Google Sheets 連結和發布設定。";
+                resultDiv.innerHTML = "🚨 內部錯誤：資料載入失敗，請稍後再試。";
                 resultDiv.className = "notFound";
             }
         }
@@ -198,27 +199,35 @@
             // --- 重置結束 ---
 
             if (cleanedName === "") {
-                resultDiv.innerHTML = "嗨嗨~請輸入本名才能找到你喔！";
+                resultDiv.innerHTML = "嗨嗨~請輸入本名或稱謂才能找到你喔！";
                 resultDiv.className = "notFound";
                 return;
             }
+            
+            // 將輸入轉為小寫，方便模糊搜尋
+            const searchKey = cleanedName.toLowerCase();
 
             // --- 貓咪彩蛋判斷 ---
-            if (cleanedName === "蘇半甲") {
+            if (searchKey === "蘇半甲".toLowerCase()) {
                 resultDiv.style.display = 'none';
                 catEasterEggImage.style.display = 'block';
                 return;
             }
             // --- 彩蛋判斷結束 ---
 
-            // 使用已載入的 g_seatingChart 進行搜尋
-            const foundGuest = g_seatingChart.find(guest => guest.name === cleanedName);
+            // 【最終優化】：搜尋邏輯 -> 檢查姓名 AND 檢查稱謂 (模糊包含)
+            const foundGuest = g_seatingChart.find(guest => 
+                // 1. 檢查姓名是否完全匹配 (不分大小寫)
+                guest.name.toLowerCase() === searchKey ||
+                // 2. 檢查 alias 欄位是否包含搜尋的關鍵詞 (模糊搜尋)
+                guest.alias.toLowerCase().includes(searchKey)
+            );
 
             if (foundGuest) {
                 resultDiv.innerHTML = `<span class="guest-name-highlight">${foundGuest.name}</span>，歡迎來到我們的婚禮❤️<br>您的桌號是：<strong>${foundGuest.table}</strong>`;
                 resultDiv.className = "found";
             } else {
-                resultDiv.innerHTML = "嗨嗨~請輸入本名才能找到你喔！";
+                resultDiv.innerHTML = "嗨嗨~請輸入本名或稱謂才能找到你喔！";
                 resultDiv.className = "notFound";
             }
         }
