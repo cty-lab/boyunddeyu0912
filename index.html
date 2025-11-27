@@ -21,22 +21,40 @@
             --color-result-found-text: var(--color-dark-green);
         }
 
+        /* === 【極致置中修正 1】: Body 採用 Flexbox 佈局 === */
         body { 
             font-family: '微軟正黑體', 'Arial', sans-serif;
-            text-align: center; 
-            padding: 20px 10px;
+            margin: 0; /* 移除瀏覽器預設邊距 */
             background-color: var(--color-background-main);
             color: var(--color-text-dark);
             overflow-x: hidden; 
+            min-height: 100vh; /* 確保內容區塊覆蓋整個畫面 */
+
+            display: flex; /* 啟用 Flexbox */
+            justify-content: center; /* 水平居中所有內容 */
+            align-items: flex-start; /* 讓內容從頂部開始堆疊 */
+            text-align: initial; /* 重置繼承的文字對齊 */
         }
+
+        /* === 【極致置中修正 2】: 內容包裝器 (確保內容置中堆疊) === */
+        #app-wrapper {
+            width: 100%;
+            max-width: 500px; /* 限制內容最大寬度 */
+            padding: 20px 10px; /* 內邊距 */
+            text-align: center; /* 讓圖片、按鈕等內容在包裝器內居中 */
+        }
+
         h1 { 
             color: var(--color-dark-blue-gray);
             margin-bottom: 40px;
             font-size: 2.16em; 
         }
+        
+        /* === 輸入欄位：維持區塊模式並確保置中 === */
         input[type="text"] { 
             padding: 16px; 
-            margin-bottom: 25px; 
+            margin: 0 auto 25px auto; 
+            display: block; 
             width: 90%; 
             max-width: 368px; 
             border: 2px solid var(--color-input-border);
@@ -44,6 +62,7 @@
             font-size: 1.25em; 
             outline: none;
         }
+        
         button { 
             padding: 16px 35px; 
             background-color: var(--color-button-bg);
@@ -64,49 +83,35 @@
             cursor: wait;
         }
         
-        /* === 圖片樣式：預設/電腦版尺寸 (80%) === */
+        /* === 圖片樣式：確保置中並響應式 === */
         .wedding-design-image {
             max-width: 80%; 
             height: auto; 
-            margin-top: 40px; 
-            margin-bottom: 20px;
+            margin: 40px auto 20px auto; 
+            display: block;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         
-        /* === 關鍵修正：使用 margin: auto 確保水平置中 === */
+        /* === 結果框：使用 margin: auto 置中，文字靠左 === */
         #result { 
-            margin-top: 30px; 
-            margin-left: auto; 
-            margin-right: auto; 
+            margin: 30px auto 0 auto; 
             padding: 25px;
             border: 2px solid #DCE0E6;
             border-radius: 12px;
-            display: block; /* 關鍵：設為區塊元素 */
+            display: block; 
             width: 90%; 
             max-width: 400px;
             font-size: 1.2em;
             line-height: 1.6;
             background-color: var(--color-background-main);
             box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-            text-align: center;
+            text-align: left; /* 保持框內文字靠左對齊 */
         }
-        /* ==================================== */
         
-        .found { 
-            background-color: var(--color-result-found-bg);
-            color: var(--color-result-found-text);
-            border-color: var(--color-result-found-text);
-        } 
-        .notFound { 
-            background-color: var(--color-light-orange);
-            color: #CC0000;
-            border-color: #CC0000;
-        } 
-        .guest-name-highlight {
-            color: var(--color-dark-blue-gray);
-            font-weight: bold;
-        }
+        .found { background-color: var(--color-result-found-bg); color: var(--color-result-found-text); border-color: var(--color-result-found-text); } 
+        .notFound { background-color: var(--color-light-orange); color: #CC0000; border-color: #CC0000; } 
+        .guest-name-highlight { color: var(--color-dark-blue-gray); font-weight: bold; }
 
         /* === 媒體查詢：手機版圖片放大優化 === */
         @media (max-width: 768px) {
@@ -117,24 +122,24 @@
     </style>
 </head>
 <body>
-    <h1>蘇柏瑜與張德妤的婚禮</h1>
-    <input type="text" id="guestName" placeholder="請輸入姓名或稱謂">
-    
-    <button onclick="searchSeat()" id="searchButton">查詢座位</button>
-    
-    <div id="result">
-        在這裡輸入姓名，查詢您的座位。
+    <div id="app-wrapper">
+        <h1>蘇柏瑜與張德妤的婚禮</h1>
+        <input type="text" id="guestName" placeholder="請輸入姓名或稱謂">
+        
+        <button onclick="searchSeat()" id="searchButton">查詢座位</button>
+        
+        <div id="result">
+            在這裡輸入姓名，查詢您的座位。
+        </div>
+
+        <img src="婚禮座位表.jpg" alt="婚禮設計主題圖片" class="wedding-design-image">
     </div>
-
-    <img src="婚禮座位表.jpg" alt="婚禮設計主題圖片" class="wedding-design-image">
-
     <script>
         // 【⭐ Google Sheets 連動：最終正確連結 ⭐】
         const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGD48WcMcPGkukcJyKEkA6vyl9TRBggoT0cAYqnXEDqqca1yftj9CFK1ChywRAng/pub?output=csv'; 
         
         let g_seatingChart = []; 
 
-        // 函數：從 Google Sheets 載入資料 (讀取 CSV)
         async function loadSeatingChart() {
             try {
                 const response = await fetch(GOOGLE_SHEET_URL);
@@ -160,7 +165,6 @@
             }
         }
 
-        // 應用程式初始化：頁面載入時自動執行
         async function initApp() {
             const resultDiv = document.getElementById("result");
             const searchButton = document.getElementById("searchButton");
@@ -181,7 +185,6 @@
             }
         }
         
-        // 搜尋函數：使用已載入的資料進行同步查詢
         function searchSeat() {
             const guestNameInput = document.getElementById("guestName").value;
             const cleanedName = guestNameInput.trim(); 
@@ -198,7 +201,6 @@
             
             const searchKey = cleanedName.toLowerCase();
 
-            // 搜尋邏輯：檢查姓名 AND 檢查稱謂 (模糊包含)
             const foundGuest = g_seatingChart.find(guest => 
                 guest.name.toLowerCase() === searchKey ||
                 guest.alias.toLowerCase().includes(searchKey)
@@ -213,7 +215,6 @@
             }
         }
 
-        // 頁面載入完成後，啟動應用程式初始化
         window.onload = initApp;
     </script>
 </body>
