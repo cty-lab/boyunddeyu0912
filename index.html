@@ -32,26 +32,26 @@
         h1 { 
             color: var(--color-dark-blue-gray);
             margin-bottom: 40px;
-            font-size: 1.8em;
+            font-size: 2.16em; /* 標題字體：放大 20% */
         }
         input[type="text"] { 
-            padding: 14px; 
+            padding: 16px; /* 放大 15% */
             margin-bottom: 25px; 
             width: 90%; 
-            max-width: 320px; 
+            max-width: 368px; /* 放大 15% */
             border: 2px solid var(--color-input-border);
             border-radius: 8px; 
-            font-size: 1.1em;
+            font-size: 1.25em; /* 放大 15% */
             outline: none;
         }
         button { 
-            padding: 14px 30px;
+            padding: 16px 35px; /* 放大 15% */
             background-color: var(--color-button-bg);
             color: var(--color-text-light);
             border: none; 
             border-radius: 8px;
             cursor: pointer; 
-            font-size: 1.1em;
+            font-size: 1.25em; /* 放大 15% */
             transition: background-color 0.3s ease, transform 0.2s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
@@ -64,9 +64,9 @@
             cursor: wait;
         }
         
-        /* === 圖片樣式：預設/電腦版尺寸 (65%) === */
+        /* === 圖片樣式：預設/電腦版尺寸 (放大 15% 至 80%) === */
         .wedding-design-image {
-            max-width: 65%; 
+            max-width: 80%; /* 寬度放大 15% (原 65% + 15%) */
             height: auto; 
             margin-top: 40px; 
             margin-bottom: 20px;
@@ -82,7 +82,7 @@
             display: inline-block;
             width: 90%; 
             max-width: 400px;
-            font-size: 1.2em;
+            font-size: 1.2em; /* 維持不變或可根據需求放大 */
             line-height: 1.6;
             background-color: var(--color-background-main);
             box-shadow: 0 6px 15px rgba(0,0,0,0.1);
@@ -103,10 +103,10 @@
             font-weight: bold;
         }
 
-        /* === 媒體查詢：手機版優化 (寬度小於 768px 時，圖片放大) === */
+        /* === 媒體查詢：手機版優化 (圖片放大 15% 至 90% + 15% = 100% 上限) === */
         @media (max-width: 768px) {
             .wedding-design-image {
-                max-width: 90%; /* 手機上圖片放大到 90% 寬度 */
+                max-width: 100%; /* 手機上放大到 100% 寬度 (原 90% + 15%) */
             }
         }
     </style>
@@ -146,7 +146,6 @@
                     const alias = columns[2] ? columns[2].trim() : '';
 
                     if (name && table) {
-                        // 返回包含稱謂的物件
                         return { name: name, table: table, alias: alias };
                     }
                 }).filter(item => item !== undefined);
@@ -194,14 +193,11 @@
                 return;
             }
             
-            // 將輸入轉為小寫，方便模糊搜尋
             const searchKey = cleanedName.toLowerCase();
 
             // 搜尋邏輯：檢查姓名 AND 檢查稱謂 (模糊包含)
             const foundGuest = g_seatingChart.find(guest => 
-                // 1. 檢查姓名是否完全匹配
                 guest.name.toLowerCase() === searchKey ||
-                // 2. 檢查稱謂欄位是否包含搜尋的關鍵詞 (模糊搜尋)
                 guest.alias.toLowerCase().includes(searchKey)
             );
 
