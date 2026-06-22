@@ -90,13 +90,21 @@
         
         /* === 圖片樣式：確保置中並響應式 === */
         .wedding-design-image {
-            max-width: 80%; 
-            height: auto; 
-            margin: 40px auto 20px auto; 
-            display: block;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
+    max-width: 100%;        /* 手機版撐滿寬度 */
+    width: min(120%, 600px); /* 桌機版放大到原來 1.5 倍，最大不超過 600px */
+    height: auto;
+    margin: 40px auto 20px auto;
+    display: block;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 768px) {
+    .wedding-design-image {
+        width: 100%;        /* 手機版直接撐滿 */
+        max-width: 100%;
+    }
+}
         
         /* === 結果框：使用 margin: auto 置中，內部文字靠左 === */
         #result { 
