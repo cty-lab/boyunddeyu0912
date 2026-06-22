@@ -24,7 +24,6 @@
             --color-result-found-text: var(--color-dark-green);
         }
 
-        /* 整體佈局：垂直排列，確保上下區塊不互相干擾 */
         body { 
             font-family: '微軟正黑體', 'Arial', sans-serif;
             margin: 0; 
@@ -34,10 +33,9 @@
             display: flex;
             flex-direction: column; 
             align-items: center;
-            padding-bottom: 60px; /* 底部留白 */
+            padding-bottom: 60px;
         }
 
-        /* === 查詢區塊 === */
         #app-wrapper {
             width: 100%;
             max-width: 500px;
@@ -100,36 +98,21 @@
         .notFound { background-color: var(--color-light-orange); color: #CC0000; border-color: #CC0000; } 
         .guest-name-highlight { color: var(--color-dark-blue-gray); font-weight: bold; }
 
-        /* === 圖片區塊 (關鍵修正區) === */
+        /* === 圖片區塊：修正為適中大小、不溢出螢幕、置中對齊 === */
         .image-wrapper {
-            width: 95%; /* 兩側保留一點邊距 */
-            max-width: 1000px; /* 電腦端最大尺寸 */
-            margin-top: 20px;
-            overflow-x: auto; /* 手機端：允許圖片水平捲動 */
-            overflow-y: hidden;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            background-color: #fff; /* 避免透明圖片穿透背景 */
+            width: 90%; /* 確保在手機上左右兩側有安全邊距 */
+            max-width: 600px; /* 限制電腦端的最大寬度，大約為之前版本的一半 */
+            margin: 20px auto; /* 確保區塊水平置中 */
+            display: flex;
+            justify-content: center;
         }
 
         .wedding-design-image {
-            width: 100%; /* 電腦端：填滿 1000px 容器 */
-            min-width: 800px; /* 手機端：強制最低寬度，確保文字可讀，觸發水平捲軸 */
+            width: 100%; /* 讓圖片填滿父層設定的寬度限制 */
             height: auto;
             display: block;
-        }
-
-        /* 自訂捲軸樣式 (讓手機端滑動區域更美觀) */
-        .image-wrapper::-webkit-scrollbar {
-            height: 8px;
-        }
-        .image-wrapper::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-            border-radius: 0 0 10px 10px;
-        }
-        .image-wrapper::-webkit-scrollbar-thumb {
-            background: var(--color-dark-blue-gray); 
             border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
     </style>
 </head>
