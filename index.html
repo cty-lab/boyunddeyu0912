@@ -89,21 +89,24 @@
         }
         
         /* === 圖片樣式：確保置中並響應式 === */
-     .wedding-design-image {
-    max-width: 100%;
-    width: 600%;
+    /* === 圖片樣式：修正為 800% 並重新計算置中比例 === */
+.wedding-design-image {
+    width: 800%;
+    max-width: 800%; /* 解除原先 100% 的限制 */
     height: auto;
-    margin: 40px auto 20px auto;
+    /* 上 40px / 右 0 / 下 20px / 左 -350% (維持 800% 寬度的視覺置中) */
+    margin: 40px 0 20px -350%;
     display: block;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
+/* === 媒體查詢：合併並統一手機版行為 === */
 @media (max-width: 768px) {
     .wedding-design-image {
-        width: 600%;
-        max-width: 600%;
-        margin-left: -250%;
+        width: 800%;
+        max-width: 800%;
+        margin: 40px 0 20px -350%;
     }
 }
         
