@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>婚禮座位查詢</title>
     <style>
-        /* === 關鍵修正：確保寬度計算不會溢出，解決跑版問題 === */
         *, *::before, *::after {
             box-sizing: border-box;
         }
-        /* ================================================= */
 
-        /* CSS 樣式：主題顏色與字體設定 */
         :root {
             --color-light-green: #CDE9B9;
             --color-dark-blue-gray: #6B7C95;
@@ -27,25 +24,24 @@
             --color-result-found-text: var(--color-dark-green);
         }
 
-        /* === Body 採用 Flexbox 佈局：確保內容水平居中 === */
+        /* 整體佈局：垂直排列，確保上下區塊不互相干擾 */
         body { 
             font-family: '微軟正黑體', 'Arial', sans-serif;
             margin: 0; 
             background-color: var(--color-background-main);
             color: var(--color-text-dark);
-            /* 移除 overflow-x: hidden; 以防 Flexbox 被錯誤影響，讓 Flexbox 自行處理 */
             min-height: 100vh; 
             display: flex;
-            justify-content: center; /* 水平居中 */
-            align-items: flex-start;
-            text-align: initial; 
+            flex-direction: column; 
+            align-items: center;
+            padding-bottom: 60px; /* 底部留白 */
         }
 
-        /* 內容包裝器：Flexbox 會將這個 div 放在畫面中央 */
+        /* === 查詢區塊 === */
         #app-wrapper {
             width: 100%;
             max-width: 500px;
-            padding: 20px 10px; 
+            padding: 40px 20px 20px 20px; 
             text-align: center; 
         }
 
@@ -55,13 +51,11 @@
             font-size: 2.16em; 
         }
         
-        /* 輸入欄位：確保置中 */
         input[type="text"] { 
             padding: 16px; 
             margin: 0 auto 25px auto; 
             display: block; 
-            width: 90%; 
-            max-width: 368px; 
+            width: 100%; 
             border: 2px solid var(--color-input-border);
             border-radius: 8px; 
             font-size: 1.25em; 
@@ -88,53 +82,54 @@
             cursor: wait;
         }
         
-        /* === 圖片樣式：確保置中並響應式 === */
-    /* === 圖片樣式：修正為 800% 並重新計算置中比例 === */
-.wedding-design-image {
-    width: 800%;
-    max-width: 800%; /* 解除原先 100% 的限制 */
-    height: auto;
-    /* 上 40px / 右 0 / 下 20px / 左 -350% (維持 800% 寬度的視覺置中) */
-    margin: 40px 0 20px -350%;
-    display: block;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-/* === 媒體查詢：合併並統一手機版行為 === */
-@media (max-width: 768px) {
-    .wedding-design-image {
-        width: 800%;
-        max-width: 800%;
-        margin: 40px 0 20px -350%;
-    }
-}
-        
-        /* === 結果框：使用 margin: auto 置中，內部文字靠左 === */
         #result { 
             margin: 30px auto 0 auto; 
             padding: 25px;
             border: 2px solid #DCE0E6;
             border-radius: 12px;
-            display: block; 
-            width: 90%; 
-            max-width: 400px;
+            display: none; 
+            width: 100%; 
             font-size: 1.2em;
             line-height: 1.6;
             background-color: var(--color-background-main);
             box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-            text-align: left; /* 保持框內文字靠左對齊 */
+            text-align: left; 
         }
         
         .found { background-color: var(--color-result-found-bg); color: var(--color-result-found-text); border-color: var(--color-result-found-text); } 
         .notFound { background-color: var(--color-light-orange); color: #CC0000; border-color: #CC0000; } 
         .guest-name-highlight { color: var(--color-dark-blue-gray); font-weight: bold; }
 
-        /* === 媒體查詢：手機版圖片放大優化 === */
-        @media (max-width: 768px) {
-            .wedding-design-image {
-                max-width: 100%; 
-            }
+        /* === 圖片區塊 (關鍵修正區) === */
+        .image-wrapper {
+            width: 95%; /* 兩側保留一點邊距 */
+            max-width: 1000px; /* 電腦端最大尺寸 */
+            margin-top: 20px;
+            overflow-x: auto; /* 手機端：允許圖片水平捲動 */
+            overflow-y: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            background-color: #fff; /* 避免透明圖片穿透背景 */
+        }
+
+        .wedding-design-image {
+            width: 100%; /* 電腦端：填滿 1000px 容器 */
+            min-width: 800px; /* 手機端：強制最低寬度，確保文字可讀，觸發水平捲軸 */
+            height: auto;
+            display: block;
+        }
+
+        /* 自訂捲軸樣式 (讓手機端滑動區域更美觀) */
+        .image-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+        .image-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 0 0 10px 10px;
+        }
+        .image-wrapper::-webkit-scrollbar-thumb {
+            background: var(--color-dark-blue-gray); 
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -148,11 +143,13 @@
         <div id="result">
             在這裡輸入姓名，查詢您的座位。
         </div>
+    </div>
 
+    <div class="image-wrapper">
         <img src="婚禮座位表.jpg" alt="婚禮設計主題圖片" class="wedding-design-image">
     </div>
+
     <script>
-        // 【⭐ Google Sheets 連動：最終正確連結 ⭐】
         const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGD48WcMcPGkukcJyKEkA6vyl9TRBggoT0cAYqnXEDqqca1yftj9CFK1ChywRAng/pub?output=csv'; 
         
         let g_seatingChart = []; 
@@ -176,8 +173,10 @@
                 }).filter(item => item !== undefined);
                 
             } catch (error) {
-                document.getElementById("result").innerHTML = "🚨 資料載入失敗，請檢查網路或 Google Sheets 連結。";
-                document.getElementById("result").className = "notFound";
+                const resultDiv = document.getElementById("result");
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = "🚨 資料載入失敗，請檢查網路或 Google Sheets 連結。";
+                resultDiv.className = "notFound";
                 return []; 
             }
         }
@@ -187,6 +186,7 @@
             const searchButton = document.getElementById("searchButton");
             
             searchButton.disabled = true;
+            resultDiv.style.display = 'block';
             resultDiv.innerHTML = "載入賓客名單中，請稍候..."; 
             resultDiv.className = "";
 
@@ -195,7 +195,7 @@
             if (g_seatingChart.length > 0) {
                 searchButton.disabled = false;
                 resultDiv.innerHTML = "在這裡輸入姓名，查詢您的座位。"; 
-            } else {
+            } else if (resultDiv.className !== "notFound") {
                 searchButton.disabled = true;
                 resultDiv.innerHTML = "🚨 內部錯誤：資料載入失敗，請稍後再試。";
                 resultDiv.className = "notFound";
@@ -207,8 +207,7 @@
             const cleanedName = guestNameInput.trim(); 
 
             const resultDiv = document.getElementById("result");
-
-            resultDiv.style.display = 'inline-block';
+            resultDiv.style.display = 'block';
 
             if (cleanedName === "") {
                 resultDiv.innerHTML = "嗨嗨~請輸入本名或稱謂才能找到你喔！";
@@ -224,7 +223,7 @@
             );
 
             if (foundGuest) {
-                resultDiv.innerHTML = `<span class="guest-name-highlight">${foundGuest.name}</span>，歡迎來到我們的婚禮❤️<br>您的桌號是：<strong>${foundGuest.table}</strong>`;
+                resultDiv.innerHTML = `<span class="guest-name-highlight">${foundGuest.name}</span>，歡迎來到我們的婚禮<br>您的桌號是：<strong>${foundGuest.table}</strong>`;
                 resultDiv.className = "found";
             } else {
                 resultDiv.innerHTML = "嗨嗨~請輸入本名或稱謂才能找到你喔！";
